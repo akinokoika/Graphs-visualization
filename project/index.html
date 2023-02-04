@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset='utf-8'>
+        <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+        <meta name='viewport' content='width=device-width, initial-scale=1'>
+        <title>Vite App</title>
+
+        <script src='./src/konva/konva.min.js'></script>
+        <script src='./src/konva/KonvaPlugin.js'></script>
+        <script src='./src/konva/TweenLite.min.js'></script>
+        <script src='./src/konva/TimelineLite.min.js'></script>
+        <script src='./src/konva/TweenMax.min.js'></script>
+        <script src='./src/konva/TimelineMax.min.js'></script>
+
+        <script src='./src/math/big.js'></script>
+        <script src='./src/math/vector.js'></script>
+
+        <link rel="stylesheet" href="./src/uikit/css/uikit-rtl.min.css" />
+        <script src="./src/uikit/js/uikit.min.js"></script>
+        <script src="./src/uikit/js/uikit-icons.min.js"></script>
+
+        <script src='./src/vue/vue.global.js'></script>
+    </head>
+    <body>
+                <div>
+                    <ul class="uk-subnav" uk-tab="connect: #component-tab" uk-switcher="animation: uk-animation-fade" uk-margin>
+                        <li><a href="#">初始化</a></li>
+                        <li><a href="#">搜索</a></li>
+                        <li><a href="#">排序</a></li>
+                        <li><a href="#">最小生成树</a></li>
+                        <li><a href="#">最短路径</a></li>
+                    </ul>
+                </div>
+                
+        
+        <ul id="component-tab" class="uk-switcher uk-margin-left uk-margin-small-top">
+            <li>
+                <div id="handle_main">
+                    <span>
+                        <label for="show">{{ v_info }}</label>-
+                        <label for="show">{{ weight_info }}</label>-
+                        <label for="show">{{ w_info }}</label>
+                    </span>
+                        <label class="uk-form-label uk-margin-small-left" for="form-stacked-text">Text</label>
+                        <span @click="handle_hinsert_type_info('v_to_w')" class="uk-margin-small uk-margin-left" uk-icon="icon: code; ratio: 0.9" uk-tooltip="title: 当前输入模式：点对点; pos: bottom-right" :hidden="!hinsert_type_info.info"></span>
+                        <span @click="handle_hinsert_type_info('text')" class="uk-margin-small uk-margin-left" uk-icon="icon: file-edit; ratio: 0.9" uk-tooltip="title: 当前输入模式：多行文本<br/>输入格式“v w weight(数字) ...”<br/>字符数应当是3的倍数; pos: bottom-right" :hidden="hinsert_type_info.info"></span>
+                        <div class="uk-flex uk-margin-small-top uk-margin-small-left" :hidden="!hinsert_type_info.info">
+                            <div uk-margin>
+                                <input v-model="v_info" class="uk-input uk-form-width-xsmall" type="text" placeholder="" aria-label="Small">
+                                <span class="uk-margin-small-left" uk-icon="minus"></span>
+                                <input v-model="weight_info" class="uk-margin-small-left uk-input uk-form-width-xsmall uk-form-small" type="number" placeholder="" aria-label="Small">
+                                <span class="uk-margin-small-left" uk-icon="minus"></span>
+                                <span uk-icon="chevron-right"></span>
+                                <input v-model="w_info" class="uk-input uk-form-width-xsmall" type="text" placeholder="" aria-label="Small">
+                            </div>
+                        </div>
+                        <p style="white-space: pre-line;">{{ line_info }}</p>
+                        <div class="uk-margin uk-width-3-4" :hidden="hinsert_type_info.info">
+                            <textarea v-model="line_info" class="uk-textarea" rows="2" placeholder="" aria-label="Textarea"></textarea>
+                        </div>
+                        
+                        <div>{{ snum_type }}</div>
+                        <div class="uk-large-margin uk-margin-small-left uk-flex">
+                            <div uk-form-custom="target: > * > span:last-child">
+                                <select v-model="snum_type" aria-label="Custom controls" :disabled="!sel_status">
+                                    <option value="1">无权无向</option>
+                                    <option value="2">无权有向</option>
+                                    <option value="3">有权无向</option>
+                                    <option value="4">有权有向</option>
+                                </select>
+                                <span class="uk-link">
+                                    <span uk-icon="icon: unlock" :hidden="!sel_status"></span>
+                                    <span uk-icon="icon: lock" :hidden="sel_status"></span>
+                                    <span></span>
+                                </span>
+                            </div>
+                            <button @click="hinsert" class="uk-button uk-button-primary uk-margin-left">生成</button>
+                            
+                        </div>
+            
+                </div>
+            </li>
+            <li>
+                <div style="margin: -15px 0 0 -15px;">
+                    <ul class="uk-subnav" uk-tab="connect: #component-tab-search" uk-switcher="animation: uk-animation-fade" uk-margin>
+                        <li><a href="#">搜索</a></li>
+                        <li><a href="#">路径</a></li>
+                        <li><a href="#">连通分量</a></li>
+                    </ul>
+                </div>
+
+                <ul id="component-tab-search" class="uk-switcher">
+                    <li>
+                        <div id="handle_search">
+                            <span>
+                                <label for="show">{{ v_info }}</label>
+                            </span>
+                            <div>
+                                <label class="uk-form-label uk-margin-small-left" for="form-stacked-text">Text</label>
+                                <div class="uk-flex uk-margin-small-top uk-margin-small-left">
+                                    <div uk-margin>
+                                        <input v-model="v_info" class="uk-input uk-form-width-xsmall" type="text" placeholder="" aria-label="Small">
+                                        <button @click="handle_search_dfs" class="uk-button uk-button-primary uk-margin-left">dfs</button>
+                                        <button @click="handle_search_bfs" class="uk-button uk-button-primary uk-margin-left">bfs</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div id="handle_search_path">
+                            <span>
+                                <span>
+                                    <label for="show">{{ v_info }}</label>
+                                    -
+                                    <label for="show">{{ w_info }}</label>
+                                </span>
+                            </span>
+                                <label class="uk-form-label uk-margin-small-left" for="form-stacked-text">Text</label>
+                                <div class="uk-flex uk-margin-small-top uk-margin-small-left">
+                                    <div uk-margin>
+                                        <input v-model="v_info" class="uk-input uk-form-width-xsmall" type="text" placeholder="" aria-label="Small">
+                                        <span class="uk-margin-small-left" uk-icon="minus"></span>
+                                        <span uk-icon="chevron-right"></span>
+                                        <input v-model="w_info" class="uk-input uk-form-width-xsmall" type="text" placeholder="" aria-label="Small">
+                                        
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="uk-margin-large-left" for="show">{{ has_path_to_info }}</label>
+                                    <label class="uk-margin-left"></label>
+                                    <label class="uk-margin-xlarge-left" for="show">{{ path_to_fs_info }}</label>
+                                </div>
+                                <div class="uk-flex uk-margin-small-top uk-margin-small-left">
+                                    <div uk-margin>
+                                        <button @click="handle_search_has_path_to" class="uk-button uk-button-primary">存在路径</button>
+                                        <button @click="handle_search_path_to_fs" class="uk-button uk-button-primary uk-margin-left" type="button" uk-tooltip="title: 所含边数最少; pos: bottom-right">最短路径</button>
+                                    </div>
+                                </div>
+                                <div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
+                                    <label><input class="uk-radio" value="dfs" type="radio" name="radio2" v-model="picked" checked> DFS </label>
+                                    <label><input class="uk-radio" value="bfs" type="radio" name="radio2" v-model="picked"> BFS </label>
+                                    <span>{{ picked }}</span>
+                                </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div id="handle_connected_components">
+                            <span>
+                                <span>
+                                    <label for="show">{{ v_info }}</label>
+                                    -
+                                    <label for="show">{{ w_info }}</label>
+                                </span>
+                            </span>
+                                <label class="uk-form-label uk-margin-small-left" for="form-stacked-text">Text</label>
+                                <div class="uk-flex uk-margin-small-top uk-margin-small-left">
+                                    <div uk-margin>
+                                        <input v-model="v_info" class="uk-input uk-form-width-xsmall" type="text" placeholder="" aria-label="Small">
+                                        <span class="uk-margin-small-left" uk-icon="minus"></span>
+                                        <span uk-icon="chevron-right"></span>
+                                        <input v-model="w_info" class="uk-input uk-form-width-xsmall" type="text" placeholder="" aria-label="Small">
+                                    </div>
+                                </div>
+                                <div class="uk-flex uk-margin-small-top uk-margin-small-left">
+                                    <div uk-margin>
+                                        <button @click="handle_connected_components" class="uk-button uk-button-primary">连通分量</button>
+                                        <button @click="handle_connected" class="uk-button uk-button-primary uk-margin-left" type="button" uk-tooltip="title: v - w 是否连通; pos: bottom-right">连通</button>
+                                        <span class="uk-margin-small-left" uk-icon="icon: info; ratio: 0.9" uk-tooltip="title: 根据 order_rule 循环查找每个没有被标记的顶点并递归调用 dfs() 来标记和它相邻的所有顶点; pos: bottom-right"></span>
+                                        <span class="uk-margin-small-left"><label for="show">{{ connected_info }}</label></span>
+                                    </div>
+                                </div>
+                                <div class="uk-margin-small-top">
+                                    <div class="uk-margin-small-top"><span uk-tooltip="title: 无向图: 顶点存储顺序<br/>有向图: 反向图 GR 的逆后序排列; pos: bottom-right">order_rule: </span><label for="show">{{ order_rule_info.info_list }}</label></div>
+                                    <div class="uk-margin-small-top"><span uk-tooltip="title: 连通分量数; pos: bottom-right">count: </span><label for="show">{{ count_info.info_list }}</label></div>
+                                    <div class="uk-margin-small-top"><span uk-tooltip="title: 保存同一个连通分量中的顶点和连通分量的标识符; pos: bottom-right">cc_list: </span><label for="show">{{ cc_id_list_info }}</label></div>
+                                </div>
+                        </div>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <div id="handle_sort">
+                    <div>
+                        <span>
+                            <label for="show">{{ w_info }}</label>
+                        </span>
+                        <label class="uk-form-label uk-margin-small-left" for="form-stacked-text">Text</label>
+                        <div class="uk-flex uk-margin-small-top uk-margin-small-left">
+                            <div uk-margin>
+                                <button @click="handle_sort_depth_first_order" class="uk-button uk-button-primary">顶点排序</button>
+                                <button @click="handle_search_topological" class="uk-button uk-button-primary uk-margin-left">拓扑排序</button>
+                            </div>
+                        </div>
+                    </div>
+                    <p><label for="show"><span uk-tooltip="title: 递归前顶点入队; pos: bottom-right">前序</span> {{ pre_info }}</label></p>
+                    <p><label for="show"><span uk-tooltip="title: 递归后顶点入队; pos: bottom-right">后序</span> {{ post_info }}</label></p>
+                    <p><label for="show"><span uk-tooltip="title: 递归后顶点压栈; pos: bottom-right">逆后序</span> {{ revpost_info }}</label></p>
+                    <p><label for="show"><span uk-tooltip="title: 所有的有向边均从排在前面的元素指向排在后面的元素; pos: bottom-right">拓扑排序</span> {{ topological_info }}</label></p>
+                </div>
+            </li>
+            <li>
+                <div style="margin: -15px 0 0 -15px;">
+                    <ul class="uk-subnav" uk-tab="connect: #component-tab-mst" uk-switcher="animation: uk-animation-fade" uk-margin>
+                        <li><a href="#">Prim</a></li>
+                        <li><a href="#">Kruskal</a></li>
+                        <li><a href="#">vyssotsky</a></li>
+                    </ul>
+                </div>
+                
+                <ul id="component-tab-mst" class="uk-switcher">
+                    <li>
+                        <div id="handle_mst_prim">
+                            <span>
+                                <label for="show">{{ s_info }}</label>
+                            </span>
+                            <div>
+                                <label class="uk-form-label uk-margin-small-left" for="form-stacked-text">Text</label>
+                                <div class="uk-flex uk-margin-small-top uk-margin-small-left">
+                                    <div uk-margin>
+                                        <input v-model="s_info" class="uk-input uk-form-width-xsmall" type="text" placeholder="" aria-label="Small">
+                                        <button @click="handle_mst_prim" class="uk-button uk-button-primary uk-margin-left">生成</button>
+                                        <span class="uk-margin-small-left" uk-icon="icon: info; ratio: 0.9" uk-tooltip="title: * 从默认首个节点起处理<br/> * 标记节点 v 将未标记的连通节点 w 的边加入优先队列<br/> * 取得当前最小权重的边, 如果未失效就加入最小生成树<br/> * 重复标记直到队列为空; pos: bottom-right"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="uk-margin-small-top">
+                                <span>优先队列</span>
+                                <ul>
+                                    <li v-for="item in pq_info.queue_list">
+                                        {{ item }}
+                                    </li>
+                                </ul>
+                                <label for="show"><span>生成树</span> {{ mst_info }}</label></p>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div id="handle_mst_kruskal">
+                            <span>
+                                <label for="show">{{ s_info }}</label>
+                            </span>
+                            <div>
+                                <label class="uk-form-label uk-margin-small-left" for="form-stacked-text">Text</label>
+                                <div class="uk-flex uk-margin-small-top uk-margin-small-left">
+                                    <div uk-margin>
+                                        <input v-model="s_info" class="uk-input uk-form-width-xsmall" type="text" placeholder="" aria-label="Small">
+                                        <button @click="handle_mst_kruskal" class="uk-button uk-button-primary uk-margin-left">生成</button>
+                                        <span class="uk-margin-small-left" uk-icon="icon: info; ratio: 0.9" uk-tooltip="title: * 将所有边的权重进行最小优先队列处理<br/> * 如果加入的边不会与已有边构成环, 就将边加入最小生成树中<br/> * 直到树中含有 V-1条边; pos: bottom-right"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="uk-margin-small-top">
+                                <span>优先队列</span>
+                                <ul>
+                                    <li v-for="item in pq_info.queue_list">
+                                        {{ item }}
+                                    </li>
+                                </ul>
+                                <label for="show"><span>生成树</span> size: {{ mst_info != '' ? mst_info.size() : '' }} < {{ vn_info }} - 1 {{ mst_info }}</label></p>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div id="handle_mst_vyssotsky">
+                            <span>
+                                <label for="show">{{ s_info }}</label>
+                            </span>
+                            <div>
+                                <label class="uk-form-label uk-margin-small-left" for="form-stacked-text">Text</label>
+                                <div class="uk-flex uk-margin-small-top uk-margin-small-left">
+                                    <div uk-margin>
+                                        <input v-model="s_info" class="uk-input uk-form-width-xsmall" type="text" placeholder="" aria-label="Small">
+                                        <button @click="handle_mst_vyssotsky" class="uk-button uk-button-primary uk-margin-left">生成</button>
+                                        <span class="uk-margin-small-left" uk-icon="icon: info; ratio: 0.9" uk-tooltip="title: * 每次将一条边添加到假设的最小生成树<br/> * 如果因此形成一个环则删去环中权重最大的边; pos: bottom-right"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="uk-margin-small-top">
+                                <span>优先队列</span>
+                                <ul>
+                                    <li v-for="item in pq_info.queue_list">
+                                        {{ item }}
+                                    </li>
+                                </ul>
+                                <label for="show"><span>生成树</span> {{ mst_info }}</label></p>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <div style="margin: -15px 0 0 -15px;">
+                    <ul class="uk-subnav" uk-tab="connect: #component-tab-spt" uk-switcher="animation: uk-animation-fade" uk-margin>
+                        <li><a href="#">dijkstra</a></li>
+                        <li><a href="#">bellman-Ford</a></li>
+                        <li><a href="#">DAG-weighted</a></li>
+                    </ul>
+                </div>
+
+                <ul id="component-tab-spt" class="uk-switcher">
+                    <li>
+                        <div id="handle_spt_djkstra">
+                            <span>
+                                <label for="show">{{ v_info }}</label>
+                                -
+                                <label for="show">{{ w_info }}</label>
+                            </span>
+                            <label class="uk-form-label uk-margin-small-left" for="form-stacked-text">Text</label>
+                            <div class="uk-flex uk-margin-small-top uk-margin-small-left">
+                                <div uk-margin>
+                                    <input v-model="v_info" class="uk-input uk-form-width-xsmall" type="text" placeholder="" aria-label="Small">
+                                    <span class="uk-margin-small-left" uk-icon="minus"></span>
+                                    <span uk-icon="chevron-right"></span>
+                                    <input v-model="w_info" class="uk-input uk-form-width-xsmall" type="text" placeholder="" aria-label="Small">
+                                </div>
+                            </div>
+                            <div class="uk-flex uk-margin-top uk-margin-small-left">
+                                <div uk-margin>
+                                    <button @click="handle_spt_djkstra" class="uk-button uk-button-primary">路径树</button>
+                                    <button @click="handle_spt_path_to_sp" class="uk-button uk-button-primary uk-margin-small-left" uk-tooltip="title: 总权重最小; pos: bottom-right">最短路径</button>
+                                    <span class="uk-margin-small-left" uk-icon="icon: info; ratio: 0.9" uk-tooltip="title: * 从起点 s 处理 (第一个 w 等于 s)<br/> * 记录: 起点到节点 w 的距离, 将 w 加入优先队列<br/> * [取得当前最小距离节点 v], 进行“放松”操作 <br/> * 放松：遍历 v 的所有连通的边以及对应节点 w, 如果不满足更优距离就更新记录和有效边 v - w<br/> * 更优距离: 起点到 w 的距离 <= 起点到 v 的距离 + v 到 w 的权重<br/> * 重复记录直到队列为空; pos: bottom-right"></span>
+                                    <label class="uk-margin-small-left" for="show">{{ path_to_sp_info }}</label>
+                                </div>
+                            </div>
+                            <div class="uk-margin-small-top">
+                                <div :hidden="res_status">
+                                    <span>优先队列 <label for="show">{{ relax_info.info_list }}</label></span>
+                                    <ul>
+                                        <li v-for="item in pq_info.queue_maps">
+                                            {{ item }}
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div :hidden="!res_status">
+                                    <span>路径树</span>
+                                    <ul>
+                                        <li v-for="item in res.last_e">
+                                            {{ item }}
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div id="handle_spt_bellman_ford">
+                            <span>
+                                <label for="show">{{ v_info }}</label>
+                                -
+                                <label for="show">{{ w_info }}</label>
+                            </span>
+                            <label class="uk-form-label uk-margin-small-left" for="form-stacked-text">Text</label>
+                            <div class="uk-flex uk-margin-small-top uk-margin-small-left">
+                                <div uk-margin>
+                                    <input v-model="v_info" class="uk-input uk-form-width-xsmall" type="text" placeholder="" aria-label="Small">
+                                    <span class="uk-margin-small-left" uk-icon="minus"></span>
+                                    <span uk-icon="chevron-right"></span>
+                                    <input v-model="w_info" class="uk-input uk-form-width-xsmall" type="text" placeholder="" aria-label="Small">
+                                </div>
+                            </div>
+                            <div class="uk-flex uk-margin-top uk-margin-small-left">
+                                <div uk-margin>
+                                    <button @click="handle_spt_bellman_ford" class="uk-button uk-button-primary">路径树</button>
+                                    <button @click="handle_spt_path_to_sp_bmf" class="uk-button uk-button-primary uk-margin-small-left" uk-tooltip="title: 负权重环不可达, 总权重最小; pos: bottom-right">最短路径</button>
+                                    <span class="uk-margin-small-left" uk-icon="icon: info; ratio: 0.9" uk-tooltip="title: * 从起点 s 处理 (第一个 w 等于 s)<br/> * 记录: 起点到节点 w 的距离, 将 w 加入队列 (不会出现重复节点)<br/> * [从队列中退出一个顶点 v], 进行“放松”操作<br/> * 放松：遍历 v 的所有连通的边以及对应节点 w, 如果不满足更优距离就更新记录和有效边 v - w<br/> * 更优距离: 起点到 w 的距离 <= 起点到 v 的距离 + v 到 w 的权重<br/> * 重复放松直到队列为空 (V个顶点V轮重复) 或 存在负权重环; pos: bottom-right"></span>
+                                    <label class="uk-margin-small-left" for="show">{{ path_to_sp_info }}</label>
+                                </div>
+                            </div>
+                            <div class="uk-margin-small-top">
+                                <div><span>是否存在负权重环: <label for="show">{{ has_negative_cycle_info }}</label></span></div>
+                                <div class="uk-margin-small-top" :hidden="res_status">
+                                    <span>队列 <label for="show">{{ relax_info.info_list }}</label></span>
+                                    <ul>
+                                        <li v-for="item in q_re_info.queue_list">
+                                            {{ item }}
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div :hidden="!res_status">
+                                    <span>路径树</span>
+                                    <ul>
+                                        <li v-for="item in res.last_e">
+                                            {{ item }}
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div id="handle_spt_DAG_weighted">
+                            <span>
+                                <label for="show">{{ v_info }}</label>
+                                -
+                                <label for="show">{{ w_info }}</label>
+                            </span>
+                            <label class="uk-form-label uk-margin-small-left" for="form-stacked-text">Text</label>
+                            <div class="uk-flex uk-margin-small-top uk-margin-small-left">
+                                <div uk-margin>
+                                    <input v-model="v_info" class="uk-input uk-form-width-xsmall" type="text" placeholder="" aria-label="Small">
+                                    <span class="uk-margin-small-left" uk-icon="minus"></span>
+                                    <span uk-icon="chevron-right"></span>
+                                    <input v-model="w_info" class="uk-input uk-form-width-xsmall" type="text" placeholder="" aria-label="Small">
+                                </div>
+                            </div>
+                            <div class="uk-flex uk-margin-top uk-margin-small-left">
+                                <div uk-margin>
+                                    <button @click="handle_spt_DAG_weighted" class="uk-button uk-button-primary">路径树</button>
+                                    <button @click="handle_spt_path_to_sp" class="uk-button uk-button-primary uk-margin-small-left" uk-tooltip="title: 总权重最小; pos: bottom-right">最短路径</button>
+                                    <span class="uk-margin-small-left" uk-icon="icon: info; ratio: 0.9" uk-tooltip="title: * 按照拓扑顺序放松所有顶点; pos: bottom-right"></span>
+                                    <label class="uk-margin-small-left" for="show">{{ path_to_sp_info }}</label>
+                                </div>
+                            </div>
+                            <div class="uk-margin-small-top">
+                                <div><span>是否是无环加权有向图: <label for="show">{{ dag_weighted_info }}</label></span></div>
+                                <div class="uk-margin-small-top">拓扑顺序：<span><label for="show">{{ topological_info }}</label></span></div>
+                                <div :hidden="res_status" class="uk-margin-small-top">
+                                    <span>优先队列 <label for="show">{{ relax_info.info_list }}</label></span>
+                                    <ul>
+                                        <li v-for="item in pq_info.queue_maps">
+                                            {{ item }}
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div :hidden="!res_status">
+                                    <span>路径树</span>
+                                    <ul>
+                                        <li v-for="item in res.last_e">
+                                            {{ item }}
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+
+        <div id="box"></div>
+    </body>
+        <script src="./src/main.js"></script>
+        <script src="./src/vue.js"></script>
+        <script src="./src/cartoon.js"></script>
+</html>
