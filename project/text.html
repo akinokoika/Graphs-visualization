@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+  <title>Dynamic Text with HTML Formatting</title>
+  <style>
+   body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      margin: 40px;
+      font-size: 22px;
+    }
+    #superbox {
+      padding: 20px; /* Add padding for spacing */
+    }
+
+    h1 {
+      font-size: 30px;
+      border-bottom: 1px solid #ccc;
+    }
+
+    h2 {
+      font-size: 26px;
+    }
+
+    p {
+      font-size: 22px;
+      margin: 10px 0;
+    }
+pre {
+      background-color: #f4f4f4;
+      border: 1px solid #d4d4d4;
+      border-radius: 3px;
+      padding: 10px;
+      white-space: pre-wrap;
+    }
+
+  
+  </style>
+</head>
+<body>
+<div id="superbox">
+  <div id="box"></div>
+  <div id="text-container"></div>
+</div>
+  <script>
+function textToArrays(text) {
+  const textArray = [];
+  const formatArray = [];
+
+  const lines = text.split('\n').map(line => line.trim()); // Split by lines and trim whitespace
+
+  for (const line of lines) {
+    if (line) { // Skip empty lines
+      const [formatText, content] = line.split('#');
+      if (formatText && content) {
+        formatArray.push(formatText);
+        textArray.push(content);
+      }
+    }
+  }
+
+  return { textArray, formatArray };
+}
+
+const inputText = `
+h1#个人介绍
+p#大家好
+`;
+
+// const { textArray, formatArray } = textToArrays(it;
+
+   const textArray = [
+"个人介绍", 
+"大家好", 
+"我叫赵鑫华",
+"很荣幸认识大家",
+"首先介绍这个网页所在的个人网站",
+"akinokoika.com",
+"接下来介绍一下小组成员",
+"吴俊鸿 张栢宽 许焕坤 何俊凡  蓝健铭 唐其权 胡荣泉 李凯业 唐志杰",
+"然后我继续做一下自我介绍",
+"我之前学的是计算机",
+"相关证书的话",
+"已通过软考中级",
+"相关语言的话",
+"★★★ JavaScript",
+"★★☆ C/C++、Python、Java",
+"★☆☆ Dart、Go",
+"<?php echo 'php天下第一'!;?>",
+"我的个人兴趣是看动漫 玩游戏",
+"动漫的话",
+"推荐魔女之旅",
+"游戏的话",
+"今年的年度游戏应该是王国之泪",
+"不过本人推荐博德之门3",
+"不推荐星空",
+"未来规划的话",
+"短期打算通过四六级",
+"顺利毕业然后考上研究生",
+"长期的话",
+"不知道大家有没有听过或用过ChatGPT",
+"这就是一个基于Transformer架构的NLP大模型",
+"今年3月一篇论文arXiv:2303.12712指出",
+"GPT-4的性不仅能接近人类水平",
+"而且远远超过ChatGPT等先前模型",
+"所以",
+"dimensions = [28*28,100,10]",
+"activation = [bypass,tanh,softmax]",
+"learn_rate = 0.6 epoch_num = 100",
+"parameters = train(parameters,learn_rate,epoch_num)",
+"accuracy(parameters,'test') # 0.9785",
+"这是我自己写过的一个ANN神经网络的部分代码",
+"个人觉得以后往这方面发展是一个比较好的方向",
+"大家有感兴趣的可以去了解和尝试一下",
+"这方面我也是萌新",
+"可以来相互交流一下",
+"谢谢大家！",
+];
+   const formatArray = [
+"h1", 
+"p", 
+"p",
+"p",
+"p",
+"h2",
+"p",
+"p",
+"p",
+"p",
+"p",
+"p",
+"p",
+"p",
+"p",
+"p",
+"pre",
+"p",
+"p",
+"p",
+"p",
+"p",
+"p",
+"p",
+"p",
+"p",
+"p",
+"p",
+"p",
+"p",
+"p",
+"p",
+"p",
+"p",
+"pre",
+"pre",
+"pre",
+"pre",
+"pre",
+"p",
+"p",
+"p",
+"p",
+"p",
+"p",
+"h1",
+];
+    const codeContainer = document.getElementById("text-container");
+    const box = document.getElementById("box");
+    let textIndex = 0;
+    let charIndex = 0;
+
+    
+function typeText() {
+      
+
+if (textIndex < textArray.length) {
+        const currentText = textArray[textIndex];
+        const currentFormat = formatArray[textIndex];
+
+     /*   if (charIndex < currentText.length) {
+          codeContainer.innerHTML = ''; // Clear the codeContainer
+          codeContainer.innerHTML += currentText.substring(0, charIndex + 1);
+          charIndex++;
+          setTimeout(typeText, 100);
+        } else {
+          const newElement = document.createElement(currentFormat);
+          newElement.textContent = currentText;
+          box.appendChild(newElement);
+          textIndex++;
+          charIndex = 0;
+          setTimeout(typeText, 1000); // Adjust the delay between elements
+        }
+*/
+
+if (charIndex < currentText.length) {
+          codeContainer.textContent = currentText.substring(0, charIndex + 1);
+          charIndex++;
+
+         codeContainer.scrollIntoView({ behavior: "smooth", block: "end" });
+
+          setTimeout(typeText, 100);
+        } else {
+          const newElement = document.createElement(currentFormat);
+          newElement.textContent = currentText;
+          box.appendChild(newElement);
+          textIndex++;
+          charIndex = 0;
+          codeContainer.textContent = ''; // Clear the codeContainer
+    
+         newElement.scrollIntoView({ behavior: "smooth", block: "end" });
+
+
+          setTimeout(typeText, 1000); // Adjust the delay between elements
+        }
+      }
+    }
+    typeText();
+  </script>
+</body>
+</html>
